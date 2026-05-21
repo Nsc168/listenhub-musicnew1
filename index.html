@@ -1581,20 +1581,29 @@
     const dur = task.duration ? task.duration + 's' : '';
     const res = task.resolution || '';
     const credits = task.creditCharged || '';
+    const tags = [res, dur, credits ? credits + ' credits' : ''].filter(Boolean).join(' · ');
 
     el.innerHTML = '<div class="results-header"><span class="tick">✓</span> Video Ready</div>';
     const card = document.createElement('div');
     card.className = 'track-card';
-    card.innerHTML =
-      '<div class="track-title">Generated Video</div>' +
-      '<div class="track-tags">' + [res, dur, credits ? credits + ' credits' : ''].filter(Boolean).join(' · ') + '</div>' +
-      (videoUrl ? '<video controls style="width:100%;margin-top:12px;max-height:300px" src="' + videoUrl + '"></video>' : '<div style="color:var(--muted);font-size:12px;margin-top:8px">No video URL returned</div>') +
-      (videoUrl ? '<button class="download-btn" style="margin-top:12px" onclick="downloadVideoFile('' + videoUrl + '', 'video.mp4')">⬇ DOWNLOAD VIDEO</button>' : '');
+
+    let html = '<div class="track-title">Generated Video</div>';
+    html += '<div class="track-tags">' + tags + '</div>';
+    if (videoUrl) {
+      html += '<video controls style="width:100%;margin-top:12px;max-height:300px" src="' + videoUrl + '"></video>';
+      html += '<button class="download-btn" style="margin-top:12px" id="videoDlBtn">⬇ DOWNLOAD VIDEO</button>';
+    } else {
+      html += '<div style="color:var(--muted);font-size:12px;margin-top:8px">No video URL returned</div>';
+    }
+    card.innerHTML = html;
     el.appendChild(card);
 
-    // Auto-download
-    if (videoUrl) setTimeout(() => downloadVideoFile(videoUrl, 'generated_video.mp4'), 1000);
+    if (videoUrl) {
+      document.getElementById('videoDlBtn').onclick = function() { downloadVideoFile(videoUrl, 'generated_video.mp4'); };
+      setTimeout(function() { downloadVideoFile(videoUrl, 'generated_video.mp4'); }, 1000);
+    }
   }
+
 
   function downloadVideoFile(url, filename) {
     const proxyUrl = PROXY_URL.trim().replace(/\/$/, '');
