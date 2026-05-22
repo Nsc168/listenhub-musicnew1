@@ -970,6 +970,38 @@
       <span class="toggle-track"></span>
       <span class="toggle-label">Instrumental only (no vocals)</span>
     </label>
+
+    <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin:16px 0 12px">Advanced Options <span style="font-size:9px">(optional)</span></div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>Vocal Gender</label>
+        <select id="extendVocalGender" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
+          <option value="">— any —</option>
+          <option value="m">Male</option>
+          <option value="f">Female</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Style Weight (0-1)</label>
+        <input type="number" id="extendStyleWeight" placeholder="e.g. 0.5" min="0" max="1" step="0.1" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;outline:none">
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>Weirdness (0-1)</label>
+        <input type="number" id="extendWeirdness" placeholder="e.g. 0.3" min="0" max="1" step="0.1" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;outline:none">
+      </div>
+      <div class="form-group">
+        <label>Audio Weight (0-1)</label>
+        <input type="number" id="extendAudioWeight" placeholder="e.g. 0.5" min="0" max="1" step="0.1" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;outline:none">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Negative Tags</label>
+      <input type="text" id="extendNegativeTags" placeholder="e.g. heavy metal, distortion, noise">
+    </div>
+
     <button class="submit-btn" id="extendBtn" onclick="createExtend()">EXTEND MUSIC</button>
   </div>
 
@@ -1010,6 +1042,7 @@
         <select id="videoModel" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
           <option value="doubao-seedance-2-fast">Seedance 2 Fast</option>
           <option value="doubao-seedance-2-pro">Seedance 2 Pro</option>
+          <option value="happyhorse">Happyhorse</option>
         </select>
       </div>
       <div class="form-group">
@@ -1035,6 +1068,8 @@
           <option value="4:3">4:3</option>
           <option value="3:4">3:4</option>
           <option value="21:9">21:9</option>
+          <option value="4:5">4:5 (HH)</option>
+          <option value="5:4">5:4 (HH)</option>
         </select>
       </div>
     </div>
@@ -1067,6 +1102,24 @@
         <div class="drop-label"><strong>Tap to select audio</strong></div>
       </div>
       <div class="file-selected" id="refAudioSelected"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Reference Video <span style="color:var(--muted);font-size:9px">Happyhorse only · mp4/mov</span></label>
+      <div class="drop-zone" id="dropZoneRefVideo" style="padding:16px">
+        <input type="file" id="refVideoFile" accept=".mp4,.mov,.webm" onchange="onVideoFileSelected('refVideo', this)">
+        <div class="drop-label"><strong>Tap to select video</strong></div>
+      </div>
+      <div class="file-selected" id="refVideoSelected"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Audio Setting <span style="color:var(--muted);font-size:9px">Happyhorse video-edit mode only</span></label>
+      <select id="videoAudioSetting" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
+        <option value="">— default —</option>
+        <option value="auto">Auto</option>
+        <option value="origin">Origin (keep source audio)</option>
+      </select>
     </div>
 
     <!-- Estimate credits -->
@@ -1404,7 +1457,7 @@
   // =============================================
   const OPENAPI_BASE = 'https://api.marswave.ai/openapi';
   let videoApiKey = localStorage.getItem('lh_video_key') || '';
-  let videoFiles = { firstFrame: null, lastFrame: null, refAudio: null };
+  let videoFiles = { firstFrame: null, lastFrame: null, refAudio: null, refVideo: null };
 
   function initVideoTab() {
     const input = document.getElementById('videoApiKey');
@@ -1426,7 +1479,7 @@
     const file = input.files[0];
     if (!file) return;
     videoFiles[type] = file;
-    const labels = { firstFrame: 'firstFrameSelected', lastFrame: 'lastFrameSelected', refAudio: 'refAudioSelected' };
+    const labels = { firstFrame: 'firstFrameSelected', lastFrame: 'lastFrameSelected', refAudio: 'refAudioSelected', refVideo: 'refVideoSelected' };
     document.getElementById(labels[type]).textContent = '✓ ' + file.name + ' (' + (file.size/1024/1024).toFixed(2) + ' MB)';
   }
 
@@ -1512,6 +1565,9 @@
 
     if (duration < 4 || duration > 15) { showError('Duration must be between 4 and 15 seconds.'); return; }
     if (resolution === '1080p' && model !== 'doubao-seedance-2-pro') { showError('1080p requires Seedance 2 Pro model.'); return; }
+    if (model === 'happyhorse' && resolution === '480p') { showError('Happyhorse does not support 480p resolution.'); return; }
+    if (model === 'happyhorse' && duration < 3) { showError('Happyhorse minimum duration is 3 seconds.'); return; }
+    if (model !== 'happyhorse' && duration < 4) { showError('Minimum duration is 4 seconds.'); return; }
 
     const btn = document.getElementById('videoBtn');
     btn.disabled = true;
@@ -1522,30 +1578,44 @@
       // Build content array
       const content = [{ type: 'text', text: prompt }];
 
-      // Upload reference files if provided
+      // Upload reference files
       if (videoFiles.firstFrame) {
         setStatus('Uploading first frame…');
-        const url = await uploadVideoFile(videoFiles.firstFrame, 'image/' + videoFiles.firstFrame.name.split('.').pop().toLowerCase());
-        content.push({ type: 'image_url', image_url: { url }, role: 'first_frame' });
+        const ext1 = videoFiles.firstFrame.name.split('.').pop().toLowerCase();
+        const url = await uploadVideoFile(videoFiles.firstFrame, 'image/' + ext1);
+        content.push({ type: 'image_url', image_url: { url: url }, role: 'first_frame' });
       }
       if (videoFiles.lastFrame) {
+        if (model === 'happyhorse') throw new Error('Happyhorse model does not support last frame.');
         setStatus('Uploading last frame…');
-        const url = await uploadVideoFile(videoFiles.lastFrame, 'image/' + videoFiles.lastFrame.name.split('.').pop().toLowerCase());
-        content.push({ type: 'image_url', image_url: { url }, role: 'last_frame' });
+        const ext2 = videoFiles.lastFrame.name.split('.').pop().toLowerCase();
+        const url = await uploadVideoFile(videoFiles.lastFrame, 'image/' + ext2);
+        content.push({ type: 'image_url', image_url: { url: url }, role: 'last_frame' });
       }
       if (videoFiles.refAudio) {
-        if (!videoFiles.firstFrame) { throw new Error('Reference audio requires a first frame image.'); }
         setStatus('Uploading reference audio…');
-        const ext = videoFiles.refAudio.name.split('.').pop().toLowerCase();
-        const ct = ext === 'wav' ? 'audio/wav' : 'audio/mpeg';
-        const url = await uploadVideoFile(videoFiles.refAudio, ct);
-        content.push({ type: 'audio_url', audio_url: { url }, role: 'reference_audio' });
+        const extA = videoFiles.refAudio.name.split('.').pop().toLowerCase();
+        const ctA = extA === 'wav' ? 'audio/wav' : 'audio/mpeg';
+        const url = await uploadVideoFile(videoFiles.refAudio, ctA);
+        content.push({ type: 'audio_url', audio_url: { url: url }, role: 'reference_audio' });
+      }
+      if (videoFiles.refVideo) {
+        if (model !== 'happyhorse') throw new Error('Reference video is only supported by Happyhorse model.');
+        setStatus('Uploading reference video…');
+        const extV = videoFiles.refVideo.name.split('.').pop().toLowerCase();
+        const ctV = extV === 'mov' ? 'video/quicktime' : 'video/mp4';
+        const url = await uploadVideoFile(videoFiles.refVideo, ctV);
+        content.push({ type: 'video_url', video_url: { url: url }, role: 'reference_video' });
       }
 
       btn.textContent = 'GENERATING…';
       setStatus('Submitting video task…');
 
-      const body = { content, model, resolution, ratio, duration, generateAudio };
+      const audioSetting = document.getElementById('videoAudioSetting').value;
+      const body = {
+        content, model, resolution, ratio, duration, generateAudio,
+        ...(audioSetting && { audioSetting: audioSetting }),
+      };
       const result = await videoApiPost('/v1/video/generation', body);
       const taskId = result.taskId || result.data?.taskId;
       setTaskId(taskId);
@@ -1989,9 +2059,24 @@
       const uploadUrl = await uploadFile(selectedExtendFile);
       setStatus('Submitting extend task…');
       setLoading('extendBtn', true, 'GENERATING…', 'EXTEND MUSIC');
-      const body = { uploadUrl, model, continueAt, provider: 'default',
-        ...(prompt && {prompt}), ...(style && {style}), ...(title && {title}),
-        ...(instrumental && {instrumental: true}) };
+      const vocalGender = document.getElementById('extendVocalGender').value;
+    const styleWeight = parseFloat(document.getElementById('extendStyleWeight').value);
+    const weirdness = parseFloat(document.getElementById('extendWeirdness').value);
+    const audioWeight = parseFloat(document.getElementById('extendAudioWeight').value);
+    const negativeTags = document.getElementById('extendNegativeTags').value.trim();
+
+    const body = {
+      uploadUrl, model, continueAt, provider: 'default',
+      ...(prompt && {prompt}),
+      ...(style && {style}),
+      ...(title && {title}),
+      ...(instrumental && {instrumental: true}),
+      ...(vocalGender && {vocalGender: vocalGender}),
+      ...(!isNaN(styleWeight) && {styleWeight: styleWeight}),
+      ...(!isNaN(weirdness) && {weirdnessConstraint: weirdness}),
+      ...(!isNaN(audioWeight) && {audioWeight: audioWeight}),
+      ...(negativeTags && {negativeTags: negativeTags}),
+    };
       const result = await apiPost('/v1/music/extend', body);
       setTaskId(result.taskId);
       setStatus('Extend submitted. Generating…');
@@ -2125,3 +2210,4 @@
 </script>
 </body>
 </html>
+
