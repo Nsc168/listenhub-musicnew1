@@ -857,7 +857,7 @@
     <button class="tab-btn" onclick="switchTab('cover')">COVER</button>
     <button class="tab-btn" onclick="switchTab('extend')">EXTEND</button>
     <button class="tab-btn" onclick="switchTab('lyrics')">LYRICS</button>
-    <button class="tab-btn" onclick="switchTab('video')">VIDEO</button>
+    <button class="tab-btn" onclick="switchTab('music2')">MUSIC+</button>
     <button class="tab-btn" onclick="switchTab('history')">HISTORY</button>
   </div>
 
@@ -970,38 +970,6 @@
       <span class="toggle-track"></span>
       <span class="toggle-label">Instrumental only (no vocals)</span>
     </label>
-
-    <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin:16px 0 12px">Advanced Options <span style="font-size:9px">(optional)</span></div>
-
-    <div class="row">
-      <div class="form-group">
-        <label>Vocal Gender</label>
-        <select id="extendVocalGender" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
-          <option value="">— any —</option>
-          <option value="m">Male</option>
-          <option value="f">Female</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Style Weight (0-1)</label>
-        <input type="number" id="extendStyleWeight" placeholder="e.g. 0.5" min="0" max="1" step="0.1" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;outline:none">
-      </div>
-    </div>
-    <div class="row">
-      <div class="form-group">
-        <label>Weirdness (0-1)</label>
-        <input type="number" id="extendWeirdness" placeholder="e.g. 0.3" min="0" max="1" step="0.1" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;outline:none">
-      </div>
-      <div class="form-group">
-        <label>Audio Weight (0-1)</label>
-        <input type="number" id="extendAudioWeight" placeholder="e.g. 0.5" min="0" max="1" step="0.1" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;outline:none">
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Negative Tags</label>
-      <input type="text" id="extendNegativeTags" placeholder="e.g. heavy metal, distortion, noise">
-    </div>
-
     <button class="submit-btn" id="extendBtn" onclick="createExtend()">EXTEND MUSIC</button>
   </div>
 
@@ -1016,126 +984,65 @@
     <div id="lyricsResults" style="margin-top:24px"></div>
   </div>
 
-  <!-- Video Panel -->
-  <div class="tab-panel" id="panel-video">
-
-    <!-- API Key input -->
-    <div class="form-group" id="videoApiKeyGroup">
-      <label>ListenHub API Key <span style="color:var(--accent);font-size:9px">lh_sk_... (no login needed)</span></label>
+  <!-- Music+ Panel (OpenAPI / lh_sk_ key) -->
+  <div class="tab-panel" id="panel-music2">
+    <div class="form-group">
+      <label>API Key <span style="color:var(--accent);font-size:9px">lh_sk_... (no OAuth needed)</span></label>
       <div class="manual-row" style="margin-bottom:0">
-        <input type="text" id="videoApiKey" placeholder="lh_sk_..." autocomplete="off">
-        <button onclick="saveVideoApiKey()">SET</button>
+        <input type="text" id="music2ApiKey" placeholder="lh_sk_..." autocomplete="off">
+        <button onclick="saveMusic2ApiKey()">SET</button>
       </div>
-      <div id="videoApiKeyStatus" style="font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:0.05em"></div>
+      <div id="music2ApiKeyStatus" style="font-size:10px;color:var(--muted);margin-top:6px"></div>
     </div>
-
-    <!-- Prompt -->
-    <div class="form-group">
-      <label>Prompt *</label>
-      <textarea id="videoPrompt" placeholder="A serene mountain lake at golden hour, gentle ripples on the water, birds flying in slow motion…"></textarea>
+    <div class="tabs" style="margin-bottom:20px">
+      <button class="tab-btn active" id="m2tab-generate" onclick="switchMusic2Tab('generate')">GENERATE</button>
+      <button class="tab-btn" id="m2tab-remix" onclick="switchMusic2Tab('remix')">REMIX</button>
+      <button class="tab-btn" id="m2tab-instrumental" onclick="switchMusic2Tab('instrumental')">INSTR</button>
+      <button class="tab-btn" id="m2tab-soundtrack" onclick="switchMusic2Tab('soundtrack')">SNDTRK</button>
+      <button class="tab-btn" id="m2tab-tools" onclick="switchMusic2Tab('tools')">TOOLS</button>
     </div>
-
-    <!-- Model / Resolution / Ratio / Duration -->
-    <div class="row">
-      <div class="form-group">
-        <label>Model</label>
-        <select id="videoModel" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
-          <option value="doubao-seedance-2-fast">Seedance 2 Fast</option>
-          <option value="doubao-seedance-2-pro">Seedance 2 Pro</option>
-          <option value="happyhorse">Happyhorse</option>
-        </select>
+    <div id="m2panel-generate">
+      <div class="form-group"><label>Prompt</label><textarea id="m2prompt" placeholder="Upbeat Mandarin pop with piano…"></textarea></div>
+      <div class="form-group"><label>Lyrics <span style="color:var(--muted);font-size:9px">optional</span></label><textarea id="m2lyrics" placeholder="[Verse]&#10;你好世界…"></textarea></div>
+      <div class="row">
+        <div class="form-group"><label>Model</label><select id="m2model" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none"><option value="">auto</option><option value="mureka-7.6">mureka-7.6</option><option value="mureka-8">mureka-8</option><option value="mureka-9">mureka-9</option><option value="mureka-o2">mureka-o2</option></select></div>
+        <div class="form-group"><label>Style</label><input type="text" id="m2style" placeholder="pop, jazz…"></div>
       </div>
-      <div class="form-group">
-        <label>Duration (4-15s)</label>
-        <input type="number" id="videoDuration" value="5" min="4" max="15" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;outline:none">
+      <div class="row">
+        <div class="form-group"><label>Title</label><input type="text" id="m2title" placeholder="My Song"></div>
+        <div class="form-group"><label>Vocal ID</label><input type="text" id="m2vocalId" placeholder="vocal_xxx"></div>
       </div>
+      <label class="toggle-row" for="m2instrumental"><input type="checkbox" id="m2instrumental"><span class="toggle-track"></span><span class="toggle-label">Instrumental only</span></label>
+      <button class="submit-btn" id="m2generateBtn" onclick="music2Generate()" style="margin-top:16px">GENERATE</button>
     </div>
-    <div class="row">
-      <div class="form-group">
-        <label>Resolution</label>
-        <select id="videoResolution" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
-          <option value="720p" selected>720p</option>
-          <option value="480p">480p</option>
-          <option value="1080p">1080p (Pro only)</option>
-        </select>
+    <div id="m2panel-remix" style="display:none">
+      <div class="form-group"><label>Audio File</label><div class="drop-zone" style="padding:16px"><input type="file" id="m2remixFile" accept=".mp3,.m4a,.wav" onchange="onMusic2File('remix',this)"><div class="drop-label"><strong>Tap to select</strong></div></div><div class="file-selected" id="m2remixFileLabel"></div><input type="text" id="m2remixUrl" placeholder="or paste audio URL / providerSongId" style="margin-top:8px;width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none"></div>
+      <div class="form-group"><label>Lyrics *</label><textarea id="m2remixLyrics" placeholder="[Verse]&#10;…"></textarea></div>
+      <div class="form-group"><label>Prompt *</label><input type="text" id="m2remixPrompt" placeholder="Upbeat jazz remix…"></div>
+      <button class="submit-btn" id="m2remixBtn" onclick="music2Remix()" style="margin-top:16px">REMIX</button>
+    </div>
+    <div id="m2panel-instrumental" style="display:none">
+      <div class="form-group"><label>Prompt OR Reference Audio</label><input type="text" id="m2instrPrompt" placeholder="Peaceful piano…" style="margin-bottom:8px;width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:13px;padding:14px 16px;outline:none"><div class="drop-zone" style="padding:16px"><input type="file" id="m2instrFile" accept=".mp3,.m4a" onchange="onMusic2File('instr',this)"><div class="drop-label"><strong>or tap to select audio</strong></div></div><div class="file-selected" id="m2instrFileLabel"></div></div>
+      <div class="form-group"><label>Model</label><select id="m2instrModel" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none"><option value="">auto</option><option value="mureka-7.6">mureka-7.6</option><option value="mureka-8">mureka-8</option><option value="mureka-9">mureka-9</option><option value="mureka-o2">mureka-o2</option></select></div>
+      <button class="submit-btn" id="m2instrBtn" onclick="music2Instrumental()" style="margin-top:16px">GENERATE INSTRUMENTAL</button>
+    </div>
+    <div id="m2panel-soundtrack" style="display:none">
+      <div class="form-group"><label>Image OR Video *</label><div class="drop-zone" style="padding:16px"><input type="file" id="m2soundtrackFile" accept="image/*,.mp4,.mov,.avi,.mkv,.webm" onchange="onMusic2File('soundtrack',this)"><div class="drop-label"><strong>Tap to select image or video</strong></div></div><div class="file-selected" id="m2soundtrackFileLabel"></div></div>
+      <div class="form-group"><label>Prompt</label><input type="text" id="m2soundtrackPrompt" placeholder="Cinematic orchestral…"></div>
+      <div class="form-group"><label>Model</label><select id="m2soundtrackModel" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none"><option value="">auto</option><option value="mureka-7.6">mureka-7.6</option><option value="mureka-8">mureka-8</option><option value="mureka-9">mureka-9</option><option value="mureka-o2">mureka-o2</option></select></div>
+      <button class="submit-btn" id="m2soundtrackBtn" onclick="music2Soundtrack()" style="margin-top:16px">GENERATE SOUNDTRACK</button>
+    </div>
+    <div id="m2panel-tools" style="display:none">
+      <div class="form-group"><label>Audio File * <span style="color:var(--muted);font-size:9px">mp3/m4a max 10MB</span></label><div class="drop-zone" style="padding:16px"><input type="file" id="m2toolFile" accept=".mp3,.m4a" onchange="onMusic2File('tool',this)"><div class="drop-label"><strong>Tap to select audio</strong></div></div><div class="file-selected" id="m2toolFileLabel"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+        <button class="submit-btn" id="m2recognizeBtn" onclick="music2Recognize()" style="font-size:13px;padding:12px">RECOGNIZE</button>
+        <button class="submit-btn" id="m2describeBtn" onclick="music2Describe()" style="font-size:13px;padding:12px">DESCRIBE</button>
+        <button class="submit-btn" id="m2stemBtn" onclick="music2Stem()" style="font-size:13px;padding:12px;background:var(--surface);color:var(--accent);border:1px solid var(--accent)">STEM</button>
       </div>
-      <div class="form-group">
-        <label>Aspect Ratio</label>
-        <select id="videoRatio" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
-          <option value="16:9" selected>16:9</option>
-          <option value="9:16">9:16</option>
-          <option value="1:1">1:1</option>
-          <option value="4:3">4:3</option>
-          <option value="3:4">3:4</option>
-          <option value="21:9">21:9</option>
-          <option value="4:5">4:5 (HH)</option>
-          <option value="5:4">5:4 (HH)</option>
-        </select>
-      </div>
+      <div class="form-group"><label>Stem Model</label><select id="m2stemModel" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none"><option value="">auto</option><option value="audio-separation-1">audio-separation-1</option><option value="audio-separation-2">audio-separation-2</option></select></div>
+      <div id="m2toolResults"></div>
     </div>
-
-    <!-- Reference inputs -->
-    <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:12px">Reference Files <span style="font-size:9px">(optional)</span></div>
-
-    <div class="form-group">
-      <label>First Frame Image</label>
-      <div class="drop-zone" id="dropZoneFirstFrame" style="padding:16px">
-        <input type="file" id="firstFrameFile" accept="image/*" onchange="onVideoFileSelected('firstFrame', this)">
-        <div class="drop-label"><strong>Tap to select image</strong></div>
-      </div>
-      <div class="file-selected" id="firstFrameSelected"></div>
-    </div>
-
-    <div class="form-group">
-      <label>Last Frame Image <span style="color:var(--muted);font-size:9px">(requires first frame)</span></label>
-      <div class="drop-zone" id="dropZoneLastFrame" style="padding:16px">
-        <input type="file" id="lastFrameFile" accept="image/*" onchange="onVideoFileSelected('lastFrame', this)">
-        <div class="drop-label"><strong>Tap to select image</strong></div>
-      </div>
-      <div class="file-selected" id="lastFrameSelected"></div>
-    </div>
-
-    <div class="form-group">
-      <label>Reference Audio <span style="color:var(--muted);font-size:9px">mp3/wav · requires ref image</span></label>
-      <div class="drop-zone" id="dropZoneRefAudio" style="padding:16px">
-        <input type="file" id="refAudioFile" accept=".mp3,.wav" onchange="onVideoFileSelected('refAudio', this)">
-        <div class="drop-label"><strong>Tap to select audio</strong></div>
-      </div>
-      <div class="file-selected" id="refAudioSelected"></div>
-    </div>
-
-    <div class="form-group">
-      <label>Reference Video <span style="color:var(--muted);font-size:9px">Happyhorse only · mp4/mov</span></label>
-      <div class="drop-zone" id="dropZoneRefVideo" style="padding:16px">
-        <input type="file" id="refVideoFile" accept=".mp4,.mov,.webm" onchange="onVideoFileSelected('refVideo', this)">
-        <div class="drop-label"><strong>Tap to select video</strong></div>
-      </div>
-      <div class="file-selected" id="refVideoSelected"></div>
-    </div>
-
-    <div class="form-group">
-      <label>Audio Setting <span style="color:var(--muted);font-size:9px">Happyhorse video-edit mode only</span></label>
-      <select id="videoAudioSetting" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;outline:none">
-        <option value="">— default —</option>
-        <option value="auto">Auto</option>
-        <option value="origin">Origin (keep source audio)</option>
-      </select>
-    </div>
-
-    <!-- Estimate credits -->
-    <div style="margin-bottom:16px">
-      <button class="history-refresh-btn" onclick="estimateVideoCredits()" style="width:100%;padding:10px">💰 ESTIMATE CREDITS</button>
-      <div id="videoEstimate" style="font-size:11px;color:var(--accent);margin-top:8px;text-align:center;letter-spacing:0.05em"></div>
-    </div>
-
-    <label class="toggle-row" for="videoGenerateAudio">
-      <input type="checkbox" id="videoGenerateAudio" checked>
-      <span class="toggle-track"></span>
-      <span class="toggle-label">Generate audio track</span>
-    </label>
-
-    <button class="submit-btn" id="videoBtn" onclick="generateVideo()" style="margin-top:20px">GENERATE VIDEO</button>
-    <div id="videoResults" style="margin-top:24px"></div>
+    <div id="music2Results" style="margin-top:24px"></div>
   </div>
 
   <!-- History Panel -->
@@ -1428,7 +1335,7 @@
   // --- Tabs ---
   function switchTab(tab) {
     activeTab = tab;
-    const tabNames = ['generate','cover','extend','lyrics','video','history'];
+    const tabNames = ['generate','cover','extend','lyrics','music2','history'];
     document.querySelectorAll('.tab-btn').forEach((b, i) => {
       b.classList.toggle('active', tabNames[i] === tab);
     });
@@ -1439,7 +1346,7 @@
     hideStatus();
     document.getElementById('results').innerHTML = '';
     if (tab === 'history' && accessToken) loadHistory();
-    if (tab === 'video') initVideoTab();
+    if (tab === 'music2') initMusic2Tab();
     // Show proxy bar on cover or extend tab
     const proxyBar = document.getElementById('proxyBar');
     if (proxyBar) {
@@ -1453,235 +1360,334 @@
 
 
   // =============================================
-  // --- VIDEO GENERATION (OpenAPI / lh_sk_ key) ---
+  // --- MUSIC+ (OpenAPI / lh_sk_ key, Mureka) ---
   // =============================================
-  const OPENAPI_BASE = 'https://api.marswave.ai/openapi';
-  let videoApiKey = localStorage.getItem('lh_video_key') || '';
-  let videoFiles = { firstFrame: null, lastFrame: null, refAudio: null, refVideo: null };
+  const OPENAPI_MUSIC_BASE = 'https://api.marswave.ai/openapi';
+  let music2ApiKey = localStorage.getItem('lh_music2_key') || '';
+  let music2Files = { remix: null, instr: null, soundtrack: null, tool: null };
+  let music2ActiveSubTab = 'generate';
 
-  function initVideoTab() {
-    const input = document.getElementById('videoApiKey');
-    if (videoApiKey) {
-      input.value = videoApiKey;
-      document.getElementById('videoApiKeyStatus').textContent = '✓ API key set';
+  function initMusic2Tab() {
+    const input = document.getElementById('music2ApiKey');
+    if (music2ApiKey) {
+      input.value = music2ApiKey;
+      document.getElementById('music2ApiKeyStatus').textContent = '✓ API key set';
     }
   }
 
-  function saveVideoApiKey() {
-    videoApiKey = document.getElementById('videoApiKey').value.trim();
-    if (videoApiKey) {
-      localStorage.setItem('lh_video_key', videoApiKey);
-      document.getElementById('videoApiKeyStatus').textContent = '✓ API key saved';
+  function saveMusic2ApiKey() {
+    music2ApiKey = document.getElementById('music2ApiKey').value.trim();
+    if (music2ApiKey) {
+      localStorage.setItem('lh_music2_key', music2ApiKey);
+      document.getElementById('music2ApiKeyStatus').textContent = '✓ Saved';
     }
   }
 
-  function onVideoFileSelected(type, input) {
-    const file = input.files[0];
+  function switchMusic2Tab(tab) {
+    music2ActiveSubTab = tab;
+    ['generate','remix','instrumental','soundtrack','tools'].forEach(function(t) {
+      var btn = document.getElementById('m2tab-' + t);
+      var panel = document.getElementById('m2panel-' + t);
+      if (btn) btn.classList.toggle('active', t === tab);
+      if (panel) panel.style.display = t === tab ? 'block' : 'none';
+    });
+    document.getElementById('music2Results').innerHTML = '';
+  }
+
+  function onMusic2File(type, input) {
+    var file = input.files[0];
     if (!file) return;
-    videoFiles[type] = file;
-    const labels = { firstFrame: 'firstFrameSelected', lastFrame: 'lastFrameSelected', refAudio: 'refAudioSelected', refVideo: 'refVideoSelected' };
+    music2Files[type] = file;
+    var labels = { remix:'m2remixFileLabel', instr:'m2instrFileLabel', soundtrack:'m2soundtrackFileLabel', tool:'m2toolFileLabel' };
     document.getElementById(labels[type]).textContent = '✓ ' + file.name + ' (' + (file.size/1024/1024).toFixed(2) + ' MB)';
   }
 
-  async function uploadVideoFile(file, contentType) {
-    // Use ListenHub OAuth API for file upload (needs accessToken)
-    // Falls back to direct URL if no OAuth token
-    if (!accessToken) throw new Error('File upload requires OAuth login. Please log in first.');
-    const ext = file.name.split('.').pop().toLowerCase();
-    const safeFileName = 'video_ref_' + Date.now() + '.' + ext;
-    const result = await apiPost('/v1/files', { fileKey: safeFileName, contentType, category: 'episode' });
-    const { presignedUrl, fileUrl } = result;
-
-    // Upload via proxy or direct
-    const proxyUrl = PROXY_URL.trim().replace(/\/$/, '');
-    if (proxyUrl) {
-      const ab = await file.arrayBuffer();
-      const bytes = new Uint8Array(ab);
-      let binary = '';
-      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-      const base64 = btoa(binary);
-      const proxyRes = await fetch(proxyUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ presignedUrl, contentType, fileData: base64 }),
-      });
-      if (!proxyRes.ok) throw new Error('File upload failed');
-    } else {
-      throw new Error('Proxy not configured. Set proxy URL in COVER tab to upload files.');
-    }
-    return 'https://storage.googleapis.com' + new URL(fileUrl).pathname;
+  function music2AuthHeaders() {
+    var key = music2ApiKey || localStorage.getItem('lh_music2_key') || '';
+    if (!key) throw new Error('Please set your lh_sk_ API key first.');
+    return { 'Authorization': 'Bearer ' + key };
   }
 
-  async function videoApiPost(path, body) {
-    if (!videoApiKey) throw new Error('API key not set. Please enter your lh_sk_ key above.');
-    const res = await fetch(OPENAPI_BASE + path, {
+  async function music2PostForm(path, formData) {
+    var headers = music2AuthHeaders();
+    var res = await fetch(OPENAPI_MUSIC_BASE + path, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + videoApiKey },
+      headers: headers,
+      body: formData,
+    });
+    var json = await res.json();
+    if (!res.ok) throw new Error(json.message || json.error || 'HTTP ' + res.status);
+    return json;
+  }
+
+  async function music2PostJson(path, body) {
+    var headers = music2AuthHeaders();
+    headers['Content-Type'] = 'application/json';
+    var res = await fetch(OPENAPI_MUSIC_BASE + path, {
+      method: 'POST',
+      headers: headers,
       body: JSON.stringify(body),
     });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.message || json.error || ('HTTP ' + res.status));
+    var json = await res.json();
+    if (!res.ok) throw new Error(json.message || json.error || 'HTTP ' + res.status);
     return json;
   }
 
-  async function videoApiGet(path) {
-    if (!videoApiKey) throw new Error('API key not set.');
-    const res = await fetch(OPENAPI_BASE + path, {
-      headers: { 'Authorization': 'Bearer ' + videoApiKey },
+  async function music2GetTask(taskId) {
+    var headers = music2AuthHeaders();
+    var res = await fetch(OPENAPI_MUSIC_BASE + '/v1/music/tasks/' + taskId, { headers: headers });
+    var json = await res.json();
+    if (!res.ok) throw new Error(json.message || 'HTTP ' + res.status);
+    return json;
+  }
+
+  async function music2Poll(taskId) {
+    var start = Date.now();
+    while (Date.now() - start < 300000) {
+      await new Promise(function(r) { setTimeout(r, 8000); });
+      var task = await music2GetTask(taskId);
+      setStatus('Status: ' + task.status + '…');
+      if (task.status === 'success') return task;
+      if (task.status === 'failed') throw new Error(task.errorMessage || 'Task failed');
+    }
+    throw new Error('Timed out');
+  }
+
+  function music2SetLoading(btnId, on, loadingText, defaultText) {
+    var btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.disabled = on;
+    btn.textContent = on ? loadingText : defaultText;
+  }
+
+  function music2RenderResults(task) {
+    var el = document.getElementById('music2Results');
+    el.innerHTML = '<div class="results-header"><span class="tick">✓</span> ' + (task.tracks ? task.tracks.length : 0) + ' Track' + (task.tracks && task.tracks.length !== 1 ? 's' : '') + ' Ready</div>';
+    if (!task.tracks || task.tracks.length === 0) {
+      el.innerHTML += '<div style="color:var(--muted);font-size:12px;padding:12px">No tracks returned.</div>';
+      return;
+    }
+    task.tracks.forEach(function(track, i) {
+      var card = document.createElement('div');
+      card.className = 'track-card';
+      card.style.animationDelay = (i * 0.08) + 's';
+      var fname = (track.title || 'track').replace(/[\/\\:*?"<>|]/g, '_').trim() + '.mp3';
+      var html = '<div class="track-title">' + (track.title || 'Untitled') + '</div>';
+      html += '<div class="track-tags">' + (track.tags || '') + '</div>';
+      html += '<audio controls src="' + track.audioUrl + '"></audio>';
+      html += '<div class="track-duration">' + formatDuration(track.duration) + '</div>';
+      html += '<button class="download-btn" style="margin-top:12px">⬇ DOWNLOAD MP3</button>';
+      if (track.flacUrl) html += '<button class="download-btn" style="margin-top:8px;margin-left:8px">⬇ FLAC</button>';
+      card.innerHTML = html;
+      var btns = card.querySelectorAll('.download-btn');
+      btns[0].onclick = function() { downloadTrack(track.audioUrl, fname); };
+      if (track.flacUrl && btns[1]) btns[1].onclick = function() { downloadTrack(track.flacUrl, fname.replace('.mp3','.flac')); };
+      el.appendChild(card);
+      setTimeout(function() { downloadTrack(track.audioUrl, fname); }, i * 1500);
     });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.message || json.error || ('HTTP ' + res.status));
-    return json;
   }
 
-  async function estimateVideoCredits() {
-    if (!videoApiKey) { alert('Please set your API key first.'); return; }
-    const model = document.getElementById('videoModel').value;
-    const resolution = document.getElementById('videoResolution').value;
-    const duration = parseInt(document.getElementById('videoDuration').value) || 5;
-    const hasVideoInput = false;
-    const el = document.getElementById('videoEstimate');
-    el.textContent = 'Estimating…';
-    try {
-      const result = await videoApiPost('/v1/video/generation/estimate', { model, resolution, duration, hasVideoInput });
-      el.textContent = 'Estimated: ' + (result.credits ?? result.data?.credits ?? '?') + ' credits / ' + (result.tokens ?? result.data?.tokens ?? '?') + ' tokens';
-    } catch (err) {
-      el.textContent = 'Error: ' + err.message;
-    }
-  }
-
-  async function generateVideo() {
+  async function music2Generate() {
     hideError();
-    const resultsEl = document.getElementById('videoResults');
-    resultsEl.innerHTML = '';
-    if (!videoApiKey) { showError('Please set your lh_sk_ API key first.'); return; }
-    const prompt = document.getElementById('videoPrompt').value.trim();
-    if (!prompt) { showError('Prompt is required.'); return; }
-    const model = document.getElementById('videoModel').value;
-    const resolution = document.getElementById('videoResolution').value;
-    const ratio = document.getElementById('videoRatio').value;
-    const duration = parseInt(document.getElementById('videoDuration').value) || 5;
-    const generateAudio = document.getElementById('videoGenerateAudio').checked;
-
-    if (duration < 4 || duration > 15) { showError('Duration must be between 4 and 15 seconds.'); return; }
-    if (resolution === '1080p' && model !== 'doubao-seedance-2-pro') { showError('1080p requires Seedance 2 Pro model.'); return; }
-    if (model === 'happyhorse' && resolution === '480p') { showError('Happyhorse does not support 480p resolution.'); return; }
-    if (model === 'happyhorse' && duration < 3) { showError('Happyhorse minimum duration is 3 seconds.'); return; }
-    if (model !== 'happyhorse' && duration < 4) { showError('Minimum duration is 4 seconds.'); return; }
-
-    const btn = document.getElementById('videoBtn');
-    btn.disabled = true;
-    btn.textContent = 'UPLOADING…';
-    setStatus('Preparing…');
-
+    document.getElementById('music2Results').innerHTML = '';
+    var prompt = document.getElementById('m2prompt').value.trim();
+    var lyrics = document.getElementById('m2lyrics').value.trim();
+    if (!prompt && !lyrics) { showError('Provide at least one of: Prompt or Lyrics'); return; }
+    music2SetLoading('m2generateBtn', true, 'GENERATING…', 'GENERATE');
+    setStatus('Generating music…');
     try {
-      // Build content array
-      const content = [{ type: 'text', text: prompt }];
-
-      // Upload reference files
-      if (videoFiles.firstFrame) {
-        setStatus('Uploading first frame…');
-        const ext1 = videoFiles.firstFrame.name.split('.').pop().toLowerCase();
-        const url = await uploadVideoFile(videoFiles.firstFrame, 'image/' + ext1);
-        content.push({ type: 'image_url', image_url: { url: url }, role: 'first_frame' });
-      }
-      if (videoFiles.lastFrame) {
-        if (model === 'happyhorse') throw new Error('Happyhorse model does not support last frame.');
-        setStatus('Uploading last frame…');
-        const ext2 = videoFiles.lastFrame.name.split('.').pop().toLowerCase();
-        const url = await uploadVideoFile(videoFiles.lastFrame, 'image/' + ext2);
-        content.push({ type: 'image_url', image_url: { url: url }, role: 'last_frame' });
-      }
-      if (videoFiles.refAudio) {
-        setStatus('Uploading reference audio…');
-        const extA = videoFiles.refAudio.name.split('.').pop().toLowerCase();
-        const ctA = extA === 'wav' ? 'audio/wav' : 'audio/mpeg';
-        const url = await uploadVideoFile(videoFiles.refAudio, ctA);
-        content.push({ type: 'audio_url', audio_url: { url: url }, role: 'reference_audio' });
-      }
-      if (videoFiles.refVideo) {
-        if (model !== 'happyhorse') throw new Error('Reference video is only supported by Happyhorse model.');
-        setStatus('Uploading reference video…');
-        const extV = videoFiles.refVideo.name.split('.').pop().toLowerCase();
-        const ctV = extV === 'mov' ? 'video/quicktime' : 'video/mp4';
-        const url = await uploadVideoFile(videoFiles.refVideo, ctV);
-        content.push({ type: 'video_url', video_url: { url: url }, role: 'reference_video' });
-      }
-
-      btn.textContent = 'GENERATING…';
-      setStatus('Submitting video task…');
-
-      const audioSetting = document.getElementById('videoAudioSetting').value;
-      const body = {
-        content, model, resolution, ratio, duration, generateAudio,
-        ...(audioSetting && { audioSetting: audioSetting }),
-      };
-      const result = await videoApiPost('/v1/video/generation', body);
-      const taskId = result.taskId || result.data?.taskId;
-      setTaskId(taskId);
-      setStatus('Video generating… (may take 1-3 minutes)');
-
-      // Poll
-      const start = Date.now();
-      let task;
-      while (Date.now() - start < 300_000) {
-        await new Promise(r => setTimeout(r, 8000));
-        task = await videoApiGet('/v1/video/generation/' + taskId);
-        const status = task.status || task.data?.status;
-        setStatus('Status: ' + status + '…');
-        if (status === 'success') { task = task.data || task; break; }
-        if (status === 'failed') throw new Error((task.data || task).errorMessage || 'Video generation failed');
-      }
-
+      var body = {};
+      if (prompt) body.prompt = prompt;
+      if (lyrics) body.lyrics = lyrics;
+      var model = document.getElementById('m2model').value;
+      var style = document.getElementById('m2style').value.trim();
+      var title = document.getElementById('m2title').value.trim();
+      var vocalId = document.getElementById('m2vocalId').value.trim();
+      var instrumental = document.getElementById('m2instrumental').checked;
+      if (model) body.model = model;
+      if (style) body.style = style;
+      if (title) body.title = title;
+      if (vocalId) body.vocalId = vocalId;
+      if (instrumental) body.instrumental = true;
+      var result = await music2PostJson('/v1/music/generate', body);
+      setTaskId(result.taskId);
+      setStatus('Task submitted. Generating…');
+      var task = await music2Poll(result.taskId);
       hideStatus();
-      renderVideoResult(task);
-
-    } catch (err) {
-      hideStatus();
-      showError('Error: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'GENERATE VIDEO';
-    }
+      music2RenderResults(task);
+    } catch(err) { hideStatus(); showError('Error: ' + err.message); }
+    finally { music2SetLoading('m2generateBtn', false, '', 'GENERATE'); }
   }
 
-  function renderVideoResult(task) {
-    const el = document.getElementById('videoResults');
-    const videoUrl = task.videoUrl || task.providerVideoUrl || '';
-    const dur = task.duration ? task.duration + 's' : '';
-    const res = task.resolution || '';
-    const credits = task.creditCharged || '';
-    const tags = [res, dur, credits ? credits + ' credits' : ''].filter(Boolean).join(' · ');
-
-    el.innerHTML = '<div class="results-header"><span class="tick">✓</span> Video Ready</div>';
-    const card = document.createElement('div');
-    card.className = 'track-card';
-
-    let html = '<div class="track-title">Generated Video</div>';
-    html += '<div class="track-tags">' + tags + '</div>';
-    if (videoUrl) {
-      html += '<video controls style="width:100%;margin-top:12px;max-height:300px" src="' + videoUrl + '"></video>';
-      html += '<button class="download-btn" style="margin-top:12px" id="videoDlBtn">⬇ DOWNLOAD VIDEO</button>';
-    } else {
-      html += '<div style="color:var(--muted);font-size:12px;margin-top:8px">No video URL returned</div>';
-    }
-    card.innerHTML = html;
-    el.appendChild(card);
-
-    if (videoUrl) {
-      document.getElementById('videoDlBtn').onclick = function() { downloadVideoFile(videoUrl, 'generated_video.mp4'); };
-      setTimeout(function() { downloadVideoFile(videoUrl, 'generated_video.mp4'); }, 1000);
-    }
+  async function music2Remix() {
+    hideError();
+    document.getElementById('music2Results').innerHTML = '';
+    var lyrics = document.getElementById('m2remixLyrics').value.trim();
+    var prompt = document.getElementById('m2remixPrompt').value.trim();
+    if (!lyrics) { showError('Lyrics are required.'); return; }
+    if (!prompt) { showError('Prompt is required.'); return; }
+    var file = music2Files.remix;
+    var url = document.getElementById('m2remixUrl').value.trim();
+    if (!file && !url) { showError('Provide an audio file or URL/providerSongId.'); return; }
+    music2SetLoading('m2remixBtn', true, 'REMIXING…', 'REMIX');
+    setStatus('Remixing…');
+    try {
+      var form = new FormData();
+      form.append('lyrics', lyrics);
+      form.append('prompt', prompt);
+      if (file) {
+        form.append('audio', file, file.name);
+      } else if (url.startsWith('http')) {
+        form.append('audioUrl', url);
+      } else {
+        form.append('providerSongId', url);
+      }
+      var result = await music2PostForm('/v1/music/remix', form);
+      setTaskId(result.taskId);
+      setStatus('Remix submitted. Generating…');
+      var task = await music2Poll(result.taskId);
+      hideStatus();
+      music2RenderResults(task);
+    } catch(err) { hideStatus(); showError('Error: ' + err.message); }
+    finally { music2SetLoading('m2remixBtn', false, '', 'REMIX'); }
   }
 
+  async function music2Instrumental() {
+    hideError();
+    document.getElementById('music2Results').innerHTML = '';
+    var prompt = document.getElementById('m2instrPrompt').value.trim();
+    var file = music2Files.instr;
+    if (!prompt && !file) { showError('Provide a prompt OR reference audio (not both).'); return; }
+    if (prompt && file) { showError('Provide exactly one of: prompt OR reference audio.'); return; }
+    music2SetLoading('m2instrBtn', true, 'GENERATING…', 'GENERATE INSTRUMENTAL');
+    setStatus('Generating instrumental…');
+    try {
+      var model = document.getElementById('m2instrModel').value;
+      var result;
+      if (prompt) {
+        var body = { prompt: prompt };
+        if (model) body.model = model;
+        result = await music2PostJson('/v1/music/instrumental', body);
+      } else {
+        var form = new FormData();
+        form.append('referenceAudio', file, file.name);
+        if (model) form.append('model', model);
+        result = await music2PostForm('/v1/music/instrumental', form);
+      }
+      setTaskId(result.taskId);
+      setStatus('Submitted. Generating…');
+      var task = await music2Poll(result.taskId);
+      hideStatus();
+      music2RenderResults(task);
+    } catch(err) { hideStatus(); showError('Error: ' + err.message); }
+    finally { music2SetLoading('m2instrBtn', false, '', 'GENERATE INSTRUMENTAL'); }
+  }
 
-  function downloadVideoFile(url, filename) {
-    const proxyUrl = PROXY_URL.trim().replace(/\/$/, '');
-    if (proxyUrl) {
-      window.open(proxyUrl + '/download?url=' + encodeURIComponent(url) + '&filename=' + encodeURIComponent(filename), '_blank');
-    } else {
-      window.open(url, '_blank');
-    }
+  async function music2Soundtrack() {
+    hideError();
+    document.getElementById('music2Results').innerHTML = '';
+    var file = music2Files.soundtrack;
+    if (!file) { showError('Please select an image or video file.'); return; }
+    music2SetLoading('m2soundtrackBtn', true, 'GENERATING…', 'GENERATE SOUNDTRACK');
+    setStatus('Generating soundtrack…');
+    try {
+      var form = new FormData();
+      var isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm)$/i.test(file.name);
+      if (isVideo) { form.append('video', file, file.name); }
+      else { form.append('image', file, file.name); }
+      var prompt = document.getElementById('m2soundtrackPrompt').value.trim();
+      var model = document.getElementById('m2soundtrackModel').value;
+      if (prompt) form.append('prompt', prompt);
+      if (model) form.append('model', model);
+      var result = await music2PostForm('/v1/music/soundtrack', form);
+      setTaskId(result.taskId);
+      setStatus('Submitted. Generating…');
+      var task = await music2Poll(result.taskId);
+      hideStatus();
+      music2RenderResults(task);
+    } catch(err) { hideStatus(); showError('Error: ' + err.message); }
+    finally { music2SetLoading('m2soundtrackBtn', false, '', 'GENERATE SOUNDTRACK'); }
+  }
+
+  async function music2Recognize() {
+    hideError();
+    var file = music2Files.tool;
+    if (!file) { showError('Please select an audio file.'); return; }
+    music2SetLoading('m2recognizeBtn', true, 'ANALYZING…', 'RECOGNIZE');
+    setStatus('Recognizing lyrics…');
+    try {
+      var form = new FormData();
+      form.append('audio', file, file.name);
+      var result = await music2PostForm('/v1/music/recognize', form);
+      hideStatus();
+      var el = document.getElementById('m2toolResults');
+      var sections = (result.result && result.result.lyricsSections) ? result.result.lyricsSections : [];
+      var html = '<div class="results-header"><span class="tick">✓</span> Lyrics Recognized</div>';
+      html += '<div class="track-card"><div style="font-size:11px;color:var(--muted);margin-bottom:8px">Duration: ' + formatDuration(result.result && result.result.duration ? result.result.duration/1000 : 0) + ' · Credits: ' + result.creditCost + '</div>';
+      if (sections.length) {
+        sections.forEach(function(s) {
+          html += '<div style="margin-bottom:12px;font-size:12px;line-height:1.7">';
+          if (s.words) s.words.forEach(function(w) { html += '<span style="color:var(--text)">' + w.word + ' </span>'; });
+          html += '</div>';
+        });
+      } else {
+        html += '<div style="color:var(--muted);font-size:12px">No lyrics sections found.</div>';
+      }
+      html += '</div>';
+      el.innerHTML = html;
+    } catch(err) { hideStatus(); showError('Error: ' + err.message); }
+    finally { music2SetLoading('m2recognizeBtn', false, '', 'RECOGNIZE'); }
+  }
+
+  async function music2Describe() {
+    hideError();
+    var file = music2Files.tool;
+    if (!file) { showError('Please select an audio file.'); return; }
+    music2SetLoading('m2describeBtn', true, 'ANALYZING…', 'DESCRIBE');
+    setStatus('Describing audio…');
+    try {
+      var form = new FormData();
+      form.append('audio', file, file.name);
+      var result = await music2PostForm('/v1/music/describe', form);
+      hideStatus();
+      var el = document.getElementById('m2toolResults');
+      var r = result.result || {};
+      el.innerHTML = '<div class="results-header"><span class="tick">✓</span> Audio Description</div>' +
+        '<div class="track-card">' +
+        '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Credits: ' + result.creditCost + '</div>' +
+        '<div style="font-size:13px;margin-bottom:12px">' + (r.description || '—') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">GENRES</div><div style="font-size:12px;margin-bottom:10px">' + ((r.genres||[]).join(', ') || '—') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">TAGS</div><div style="font-size:12px;margin-bottom:10px">' + ((r.tags||[]).join(', ') || '—') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">INSTRUMENTS</div><div style="font-size:12px">' + ((r.instruments||[]).join(', ') || '—') + '</div>' +
+        '</div>';
+    } catch(err) { hideStatus(); showError('Error: ' + err.message); }
+    finally { music2SetLoading('m2describeBtn', false, '', 'DESCRIBE'); }
+  }
+
+  async function music2Stem() {
+    hideError();
+    var file = music2Files.tool;
+    if (!file) { showError('Please select an audio file.'); return; }
+    music2SetLoading('m2stemBtn', true, 'SEPARATING…', 'STEM');
+    setStatus('Separating audio stems…');
+    try {
+      var form = new FormData();
+      form.append('audio', file, file.name);
+      var model = document.getElementById('m2stemModel').value;
+      if (model) form.append('model', model);
+      var result = await music2PostForm('/v1/music/stem', form);
+      hideStatus();
+      var el = document.getElementById('m2toolResults');
+      var r = result.result || {};
+      var expires = r.expiresAt ? new Date(r.expiresAt * 1000).toLocaleString() : '~24h';
+      el.innerHTML = '<div class="results-header"><span class="tick">✓</span> Stems Ready</div>' +
+        '<div class="track-card">' +
+        '<div style="font-size:12px;color:var(--muted);margin-bottom:12px">Credits: ' + result.creditCost + ' · Expires: ' + expires + '</div>' +
+        (r.zipUrl ? '<a class="download-btn" href="' + r.zipUrl + '" target="_blank" style="display:inline-block;margin-bottom:8px">⬇ STEMS ZIP</a>' : '') +
+        (r.midiZipUrl ? '<a class="download-btn" href="' + r.midiZipUrl + '" target="_blank" style="display:inline-block;margin-left:8px">⬇ MIDI ZIP</a>' : '') +
+        '</div>';
+    } catch(err) { hideStatus(); showError('Error: ' + err.message); }
+    finally { music2SetLoading('m2stemBtn', false, '', 'STEM'); }
   }
 
   // --- Download ---
@@ -2059,24 +2065,9 @@
       const uploadUrl = await uploadFile(selectedExtendFile);
       setStatus('Submitting extend task…');
       setLoading('extendBtn', true, 'GENERATING…', 'EXTEND MUSIC');
-      const vocalGender = document.getElementById('extendVocalGender').value;
-    const styleWeight = parseFloat(document.getElementById('extendStyleWeight').value);
-    const weirdness = parseFloat(document.getElementById('extendWeirdness').value);
-    const audioWeight = parseFloat(document.getElementById('extendAudioWeight').value);
-    const negativeTags = document.getElementById('extendNegativeTags').value.trim();
-
-    const body = {
-      uploadUrl, model, continueAt, provider: 'default',
-      ...(prompt && {prompt}),
-      ...(style && {style}),
-      ...(title && {title}),
-      ...(instrumental && {instrumental: true}),
-      ...(vocalGender && {vocalGender: vocalGender}),
-      ...(!isNaN(styleWeight) && {styleWeight: styleWeight}),
-      ...(!isNaN(weirdness) && {weirdnessConstraint: weirdness}),
-      ...(!isNaN(audioWeight) && {audioWeight: audioWeight}),
-      ...(negativeTags && {negativeTags: negativeTags}),
-    };
+      const body = { uploadUrl, model, continueAt, provider: 'default',
+        ...(prompt && {prompt}), ...(style && {style}), ...(title && {title}),
+        ...(instrumental && {instrumental: true}) };
       const result = await apiPost('/v1/music/extend', body);
       setTaskId(result.taskId);
       setStatus('Extend submitted. Generating…');
@@ -2210,4 +2201,3 @@
 </script>
 </body>
 </html>
-
