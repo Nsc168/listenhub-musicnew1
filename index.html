@@ -1417,7 +1417,7 @@
     });
     var json = await res.json();
     if (!res.ok) throw new Error(json.message || json.error || 'HTTP ' + res.status);
-    return json;
+    return json.data || json;
   }
 
   async function music2PostJson(path, body) {
@@ -1430,7 +1430,7 @@
     });
     var json = await res.json();
     if (!res.ok) throw new Error(json.message || json.error || 'HTTP ' + res.status);
-    return json;
+    return json.data || json;
   }
 
   async function music2GetTask(taskId) {
@@ -1438,7 +1438,8 @@
     var res = await fetch(OPENAPI_MUSIC_BASE + '/v1/music/tasks/' + taskId, { headers: headers });
     var json = await res.json();
     if (!res.ok) throw new Error(json.message || 'HTTP ' + res.status);
-    return json;
+    // API may wrap result in data field
+    return json.data || json;
   }
 
   async function music2Poll(taskId) {
